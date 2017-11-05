@@ -36,6 +36,9 @@ class UserForm(ModelForm):
             'password': PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
             'email': TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
         }
+        help_texts = {
+            'username': 'This is your secret codename. Pick something that cannot be used to identify you.',
+        }
 
     def clean(self, *args, **kwargs):
         self.cleaned_data['first_name'] = self.data['first_name'].capitalize()

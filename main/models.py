@@ -67,6 +67,8 @@ from twilio.rest import Client
 
 # TODO: favicon doesn't work
 
+# TODO: post useful information to the admin user about Twilio (e.g., pricing at $0.0075 per text notification; around 4 (or however many) notifications expected per player; so $20 can support ___ players, $30 can support ___ players, etc. etc.). Allow admin to customize what kinds of notifications are sent (based on how much he plans to charge to his account). He can choose bare minimum notifications (e.g. approx 4 notifications sent per player). Or he can choose to also enable optional "reminder" messages to people periodically. Etc. etc.
+
 # RULES: Once there are 10 players left, players kill their targets by marking their skin with permanent marker. Players also have the ability to defend themselves against their attackers by marking their attackers back.
 # RULES: Once there are only 2 players left, the quota checks will stop, and the last two players will have to fight it out, as long as it takes, to win the game.
 
@@ -74,12 +76,12 @@ from Survivor import settings
 
 EMAIL_SUBJECT_LINE = 'FIJI Survivor'
 EMAIL_FROM_ADDRESS = 'fijisurvivor@gmail.com'
-MESSAGE_HEADER = '---- Survivor ---- '  # TODO Ben
+MESSAGE_HEADER = '---- FIJI Survivor ---- '  # TODO Ben
 DEFAULT_REGISTRATION_PERIOD_DAYS = 7  # TODO: 1 week for signup by default
 DEFAULT_QUOTA_PERIOD_DAYS = 7  # TODO: number of days per quota check; players need to get at least 1 kill every 7 days by default
 
-GAME_START_MESSAGE = "The game has started. Let the games begin! Rules are on the website. Stay safe, have fun, and good luck!"  # TODO: display initial target name
-GAME_END_MESSAGE = "The game has ended. See website for more info."
+GAME_START_MESSAGE = "The game has started! Your target is %s. Stay safe, have fun, and good luck!"  # TODO: display initial target name
+GAME_END_MESSAGE = "The game has ended. See the website for more info."
 GAME_CANCELLED_MESSAGE = "The game has been cancelled by an admin. Please check the website for more details."
 
 url_validator = RegexValidator(regex=r'^(http(s)?://)?([\w-]+\.)+[\w-]+[.com]+(/[/?%&=]*)?$', message='Must be a valid URL')
@@ -330,7 +332,7 @@ class Game(models.Model):
                 print(player.user.email)
         #         message = (EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email])
         #         message_list.append(message)
-        # send_mass_mail(tuple(message_list), fail_silently=True)  # TODO: send_mail() works but send_mass_mail() doesn't; why?
+        # send_mass_mail(tuple(message_list), fail_silently=True)  # TODO: send_mail() works but send_mass_mail() doesn't; why? https://docs.djangoproject.com/en/1.11/topics/email/#django.core.mail.send_mail
 
     def send_message_to_admin(self, message):  # TODO: temp
         send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [self.admin.email], fail_silently=True)
