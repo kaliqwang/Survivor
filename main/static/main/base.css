@@ -2,7 +2,8 @@
 body {
   padding-top: 3.5rem;
   color: #fff;
-  background-color: #00254c;
+  background-color: #000;
+  /* background-color: #00254c; */
 }
 
 .container {
@@ -20,4 +21,5 @@ body {
 .card {
   margin-top: 1rem;
   margin-bottom: 1rem;
+  background-color: #444;
 }
