@@ -1,0 +1,259 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block content %}
+
+{% if game %}
+  <!--Current game exists-->
+  {% if user.is_superuser %}
+    <!--Admin User-->
+    <div class="row">
+      {% if game.has_ended %}
+        <div class="col-sm">
+          <a href="{% url 'close-game' %}" class="btn btn-lg btn-primary btn-block btn-long-resp" >Close Game</a>
+          <div class="text-center">(Will remove game results from website)</div>
+        </div>
+      {% else %}
+        <div class="col-sm">
+          <a href="{% url 'close-game' %}" class="btn btn-lg btn-danger btn-block btn-long-resp">Cancel Game</a>
+        </div>
+        <div class="col-sm">
+          <a href="{% url 'update-game' %}" class="btn btn-lg btn-secondary btn-block btn-long-resp">Game Settings</a>
+        </div>
+      {% endif %}
+    </div>
+    <br>
+  {% else %}
+    <!--Normal User-->
+  {% endif %}
+
+  {% if game.has_started %}
+    <!--Current game has started-->
+    {% if game.has_ended %}
+      <!--Current game has ended-->
+      <div><h6>Game results</h6></div>
+      <br>
+      <div class="row text-center">
+        <div class="col-sm">
+          <h5>Duration: {{ game.length }} {% if game.length == 1 %}day{% else %}days{% endif %}</h5>
+          <h5>Number of players: {{ game.num_players }}</h5>
+        </div>
+        <div class="col-sm">
+          <h5>First place: {{ game.first_place }}</h5>
+          <h5>Second place: {{ game.second_place }}</h5>
+          <h5>Third place: {{ game.third_place }}</h5>
+        </div>
+        <div class="col-sm">
+          <h5>Most eliminations:</h5>
+          <h5>
+            {% for player in game.most_kills %}
+              {% if forloop.last %} {{ player }} {% else %} {{ player }}, {% endif %}
+            {% endfor %}
+          </h5>
+        </div>
+      </div>
+    {% else %}
+      <!--Current game has not ended-->
+      {% if player %}
+        <!--User is participating in game-->
+        {% if player.alive %}
+          <!--Player is alive-->
+          <div><h6>Player stats</h6></div>
+          <br>
+          <div class="row text-center">
+            <div class="col-sm">
+              <h3>Your Target:</h3>
+              <h3>{{ player.target }}</h3>
+              <br>
+              <a href="{% url 'killed-target' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Target Eliminated</a>
+              <a href="{% url 'killed-attacker' %}" class="btn btn-lg btn-warning btn-block btn-long-resp">Killed Attacker in Self Defense</a>
+            </div>
+            <div class="col-sm">
+              <br>
+              <h5>Kills: {{ player.num_kills }}</h5>
+              <h5>Kills this quota: {{ player.num_kills_this_quota }}</h5>
+              <h5>Quota met: {% if player.quota_met %}Yes{% else %}No{% endif %}</h5>
+            </div>
+            <div class="col-sm">
+              <br>
+              <h5>Quota check in:</h5>
+              <div class="col-sm">
+                <div class="card">
+                  <div class="card-body text-center" id="timer-quota-check"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        {% else %}
+          <!--Player is dead-->
+        {% endif %}
+      {% else %}
+        <!--User is not participating in game-->
+      {% endif %}
+    {% endif %}
+    <!--Game stats-->
+    <hr>
+    <div><h6>Game stats</h6></div>
+    <br>
+    <div class="row text-center">
+      <div class="col-sm">
+        <h3>Total: {{ game.num_players }}</h3>
+      </div>
+      <div class="col-sm">
+        <h3>Alive: {{ game.num_alive }}</h3>
+      </div>
+      <div class="col-sm">
+        <h3>Dead: {{ game.num_dead }}</h3>
+      </div>
+    </div>
+
+    <!--Leaderboard-->
+    <hr>
+    <div><h6>Leaderboard</h6></div>
+    <br>
+    <div class="row text-center">
+      <div class="col">
+        <h5>Player</h5>
+      </div>
+      <div class="col">
+        <h5>Kills</h5>
+      </div>
+      <div class="col">
+        <h5>Status</h5>
+      </div>
+    </div>
+    {% for player in game.players_ordered_by_num_kills_decreasing.all %}
+      <!--TODO: good way of displaying alive vs dead-->
+      <div class="row text-center">
+        <div class="col">
+          {{ player }}
+        </div>
+        <div class="col">
+          {{ player.num_kills_copy }}
+        </div>
+        <div class="col">
+          {% if player.alive %}Alive{% else %}Dead{% endif %}
+        </div>
+      </div>
+    {% endfor %}
+
+    {% if user.is_superuser and game.eliminations %}
+      <!--Elimination log-->
+      <hr>
+      <div><h6>Elimination log</h6></div>
+      <br>
+      <div class="row text-center">
+        <div class="col">
+          <h5>Attacker</h5>
+        </div>
+        <div class="col">
+          <h5>Target</h5>
+        </div>
+        {% if not game.has_ended %}
+          <div class="col">
+            <h5>Revert</h5>
+          </div>
+        {% endif %}
+      </div>
+      {% for e in game.eliminations.all %}
+        <div class="row text-center">
+          <div class="col">
+            {{ e.killer_name }}
+          </div>
+          <div class="col">
+            {{ e.target }}
+          </div>
+          {% if not game.has_ended %}
+            <div class="col">
+              {% if e.valid %}
+                <a href="{% url 'elimination-undo' e.pk %}" class="btn btn-sm btn-danger btn-block btn-long-resp">Revert</a>
+              {% else %}
+                Reverted
+              {% endif %}
+            </div>
+          {% endif %}
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% else %}
+    <!--Current game has not started-->
+    <div class="row text-center">
+      <div class="col-sm">
+        <br>
+        <h4>The game is about to start!</h4>
+      </div>
+      <div class="col-sm">
+        <div class="card">
+          <div class="card-body" id="timer-game-start"></div>
+        </div>
+      </div>
+      {% if user.is_superuser %}
+        <!--Admin User-->
+        <div class="col-sm">
+          <br>
+          <a href="{% url 'start-game' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Manually Start Game Now</a>
+        </div>
+      {% else %}
+        <!--Normal User-->
+        {% if player %}
+          <div class="col-sm">
+            <br>
+            <h4>You have joined the game.</h4>
+            <a href="{% url 'leave-game' %}" class="btn btn-lg btn-warning btn-block btn-long-resp">Leave Game</a>
+          </div>
+        {% else %}
+          <div class="col-sm">
+            <br>
+            <a href="{% url 'join-game' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Join Game</a>
+          </div>
+        {% endif %}
+      {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="text-center"><h4>Players registered: {{ game.num_players }}</h4></div>
+  {% endif %}
+{% else %}
+  <!--Current game does not exist-->
+  {% if user.is_superuser %}
+    <!--Admin User-->
+    <a href="{% url 'create-game' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Create Game</a>
+  {% endif %}
+{% endif %}
+
+{% endblock %}
+
+{% block script %}
+
+<script>
+  {% if date_next_quota_check %}
+    var dateQuotaCheck = new Date({{ date_next_quota_check.year }}, {{ date_next_quota_check.month }} - 1, {{ date_next_quota_check.day }});
+    console.log(dateQuotaCheck);
+    $('#timer-quota-check').countdown(dateQuotaCheck)
+      .on('update.countdown', function (event) {
+        $(this).text(event.strftime('%-D days %H:%M:%S'));
+      })
+      .on('finish.countdown', function (event) {
+        <!--TODO-->
+      })
+      .on('stop.countdown', function (event) {
+        <!--TODO-->
+      });
+  {% elif not game.has_started %}
+    var dateGameStart = new Date({{ game.date_start.year }}, {{ game.date_start.month }} - 1, {{ game.date_start.day }});
+    $('div#timer-game-start').countdown(dateGameStart)
+      .on('update.countdown', function (event) {
+        $(this).text(event.strftime('%-D days %H:%M:%S'));
+      })
+      .on('finish.countdown', function (event) {
+        <!--TODO-->
+      })
+      .on('stop.countdown', function (event) {
+        <!--TODO-->
+      });
+   {% endif %}
+</script>
+
+{% endblock %}

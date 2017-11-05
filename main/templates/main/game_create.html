@@ -1,0 +1,70 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}Create New Game{% endblock %}
+
+{% block content %}
+
+<form action = "{% url 'create-game' %}" id="game_form" method="post">
+  {% csrf_token %}
+
+  <h2>Create New Game</h2>
+
+  <hr>
+
+  {{ game_form.non_field_errors }}
+
+  <div class="row form-group">
+    <label for="{{ game_form.date_start.id_for_label }}" class="col-sm-3 col-form-label">{{ game_form.date_start.label }}</label>
+    <div class="col-sm-9">
+      <div class="{% if game_form.date_start.errors %}form-error{% endif %}">{{ game_form.date_start }}</div>
+      {{ game_form.date_start.help_text }}
+      {{ game_form.date_start.errors }}
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label for="{{ game_form.quota_period_days.id_for_label }}" class="col-sm-3 col-form-label">{{ game_form.quota_period_days.label }}</label>
+    <div class="col-sm-9">
+      <div class="{% if game_form.quota_period_days.errors %}form-error{% endif %}">{{ game_form.quota_period_days }}</div>
+      {{ game_form.quota_period_days.help_text }}
+      {{ game_form.quota_period_days.errors }}
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label for="{{ game_form.twilio_phone_num.id_for_label }}" class="col-sm-3 col-form-label">{{ game_form.twilio_phone_num.label }}</label>
+    <div class="col-sm-9">
+      <div class="{% if game_form.twilio_phone_num.errors %}form-error{% endif %}">{{ game_form.twilio_phone_num }}</div>
+      {{ game_form.twilio_phone_num.help_text }}
+      {{ game_form.twilio_phone_num.errors }}
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label for="{{ game_form.twilio_account_sid.id_for_label }}" class="col-sm-3 col-form-label">{{ game_form.twilio_account_sid.label }}</label>
+    <div class="col-sm-9">
+      <div class="{% if game_form.twilio_account_sid.errors %}form-error{% endif %}">{{ game_form.twilio_account_sid }}</div>
+      {{ game_form.twilio_account_sid.help_text }}
+      {{ game_form.twilio_account_sid.errors }}
+    </div>
+  </div>
+
+  <div class="row form-group">
+    <label for="{{ game_form.twilio_auth_token.id_for_label }}" class="col-sm-3 col-form-label">{{ game_form.twilio_auth_token.label }}</label>
+    <div class="col-sm-9">
+      <div class="{% if game_form.twilio_auth_token.errors %}form-error{% endif %}">{{ game_form.twilio_auth_token }}</div>
+      {{ game_form.twilio_auth_token.help_text }}
+      {{ game_form.twilio_auth_token.errors }}
+    </div>
+  </div>
+
+  <br>
+
+  <button class="btn btn-lg btn-success btn-block" type="submit">Create New Game</button>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}

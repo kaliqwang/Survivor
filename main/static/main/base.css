@@ -1,0 +1,21 @@
+/* Move down content because we have a fixed navbar that is 3.5rem tall */
+body {
+  padding-top: 3.5rem;
+}
+
+.container {
+  padding: 15px;
+}
+
+.form-error > input {
+  border-color: #dc3545;
+}
+
+.alert {
+  margin-bottom: 0rem;
+}
+
+.card {
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+}

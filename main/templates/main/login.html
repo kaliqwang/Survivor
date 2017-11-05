@@ -1,0 +1,28 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}FIJI Survivor Sign-in{% endblock %}
+
+{% block content %}
+
+<form class="form-signin" action="{% url 'login' %}" method="post">
+  {% csrf_token %}
+
+  {{ login_form.username }}
+  {{ login_form.password }}
+
+  <input hidden name="next_page" value="{{ next_page }}"/>
+
+  <br>
+
+  <button class="btn btn-lg btn-success btn-block" type="submit">Sign in</button>
+
+  <br>
+
+  <div>Don't have an account? <a href="{% url 'register' %}">Create Account</a></div>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}

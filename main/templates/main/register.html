@@ -1,0 +1,77 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}Create New Account{% endblock %}
+
+{% block content %}
+
+<form action = "{% url 'register' %}" id="user_form" method="post">
+    {% csrf_token %}
+
+    <h2>Create New Account</h2>
+
+    <hr>
+
+    <div class="row form-group">
+      <label for="{{ user_form.first_name.id_for_label }}" class="col-sm-3 col-form-label">{{ user_form.first_name.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if user_form.first_name.errors %}form-error{% endif %}">{{ user_form.first_name }}</div>
+        {{ user_form.first_name.help_text }}
+        {{ user_form.first_name.errors }}
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <label for="{{ user_form.last_name.id_for_label }}" class="col-sm-3 col-form-label">{{ user_form.last_name.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if user_form.last_name.errors %}form-error{% endif %}">{{ user_form.last_name }}</div>
+        {{ user_form.last_name.help_text }}
+        {{ user_form.last_name.errors }}
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <label for="{{ user_form.username.id_for_label }}" class="col-sm-3 col-form-label">{{ user_form.username.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if user_form.username.errors %}form-error{% endif %}">{{ user_form.username }}</div>
+        {{ user_form.username.help_text }}
+        {{ user_form.username.errors }}
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <label for="{{ user_form.password.id_for_label }}" class="col-sm-3 col-form-label">{{ user_form.password.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if user_form.password.errors %}form-error{% endif %}">{{ user_form.password }}</div>
+        {{ user_form.password.help_text }}
+        {{ user_form.password.errors }}
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <label for="{{ user_form.email.id_for_label }}" class="col-sm-3 col-form-label">{{ user_form.email.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if user_form.email.errors %}form-error{% endif %}">{{ user_form.email }}</div>
+        {{ user_form.email.help_text }}
+        {{ user_form.email.errors }}
+      </div>
+    </div>
+
+    <div class="row form-group">
+      <label for="{{ profile_form.phone_num.id_for_label }}" class="col-sm-3 col-form-label">{{ profile_form.phone_num.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if profile_form.phone_num.errors %}form-error{% endif %}">{{ profile_form.phone_num }}</div>
+        {{ profile_form.phone_num.help_text }}
+        {{ profile_form.phone_num.errors }}
+      </div>
+    </div>
+
+    <br>
+
+    <button class="btn btn-lg btn-success btn-block" type="submit">Create New Account</button>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}

@@ -1,0 +1,21 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}Confirm Elimination{% endblock %}
+
+{% block content %}
+
+<form action = "{% url 'killed-target' %}" id="confirm_killed_target_form" method="post">
+  {% csrf_token %}
+
+  <h5>Your Target: {{ target }}</h5>
+
+  <br>
+
+  <button class="btn btn-lg btn-success btn-block btn-long-resp" type="submit">Confirm Elimination</button>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}

@@ -1,0 +1,31 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}Confirm Close Game{% endblock %}
+
+{% block content %}
+
+<form action = "{% url 'elimination-undo' elimination.pk %}" id="confirm_close_game_form" method="post">
+  {% csrf_token %}
+
+  <div>
+    Elimination details:
+  </div>
+
+  <div>
+    {{ elimination.target }} was killed by {{ elimination.killer_name }} on {{ elimination.timestamp }}
+  </div>
+
+  <div>
+    Are you sure you want to revert this elimination? This will also revert any future eliminations that are dependent on this elimination (including quota checks). This process may take a long time (several seconds per elimination reverted).
+  </div>
+
+  <br>
+
+  <button class="btn btn-lg btn-danger btn-block btn-long-resp" type="submit">Confirm Revert Elimination</button>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}

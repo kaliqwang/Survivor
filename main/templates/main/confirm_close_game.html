@@ -1,0 +1,27 @@
+{% extends 'main/base.html' %}
+
+{% load static from staticfiles %}
+
+{% block title %}Confirm Close Game{% endblock %}
+
+{% block content %}
+
+<form action = "{% url 'close-game' %}" id="confirm_close_game_form" method="post">
+  {% csrf_token %}
+
+  <div>
+    {% if game.has_ended %}
+      Are you sure you want to close the game? The game will be archived and game results will no longer be viewable on the website.
+    {% else %}
+      Are you sure you want to cancel the game? All players will receive a notification.
+    {% endif %}
+  </div>
+
+  <br>
+
+  <button class="btn btn-lg btn-{% if game.has_ended %}primary{% else %}danger{% endif %} btn-block btn-long-resp" type="submit">Confirm</button>
+</form>
+
+{% endblock %}
+
+{% block script %}{% endblock %}
