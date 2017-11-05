@@ -1,3 +1,5 @@
+#!/home/fijisurvivor/.virtualenvs/survivorenv/bin/python3.6
+
 import os, sys, django
 
 proj_path = "/home/fijisurvivor/Survivor"  # TODO: hardcoded
