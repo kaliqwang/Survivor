@@ -314,7 +314,7 @@ class Game(models.Model):
     def send_message(self, player, message):
         if player.user.profile.phone_num:
             try:
-                self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                self.client.messages.create(to='+1'+player.user.profile.phone_num, from_='+1'+self.twilio_phone_num, body=MESSAGE_HEADER+message)
             except Exception as e:
                 print(e)  # TODO: log error
         if player.user.email:
@@ -325,7 +325,7 @@ class Game(models.Model):
         for player in players:
             if player.user.profile.phone_num:
                 try:
-                    self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                    self.client.messages.create(to='+1'+player.user.profile.phone_num, from_='+1'+self.twilio_phone_num, body=MESSAGE_HEADER+message)
                 except Exception as e:
                     print(e)  # TODO: log error
             if player.user.email:
