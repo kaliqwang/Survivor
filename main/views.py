@@ -284,6 +284,7 @@ def killed_target(request):
 
 @login_required
 def killed_attacker(request):
+    # TODO: security: in case user enters url manually - don't allow this to run unless there are 10 or fewer players left in the game
     game = Game.objects.get_current()
     if game:
         player = request.user.players.get_or_none(game=game)

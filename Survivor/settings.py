@@ -129,6 +129,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_HOST_USER = 'fijisurvivor@gmail.com'
 EMAIL_HOST_PASSWORD = 'fijisurvivor3430'
 EMAIL_PORT = 587
+EMAIL_SUBJECT_PREFIX = ''  # TODO
 
 
 # User Authentication

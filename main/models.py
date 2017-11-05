@@ -65,6 +65,7 @@ from twilio.rest import Client
 
 # TODO: fix timezone-aware issues (e.g. on confirm revert elimination page - make sure timestamp is correct)
 
+# TODO: favicon doesn't work
 
 # RULES: Once there are 10 players left, players kill their targets by marking their skin with permanent marker. Players also have the ability to defend themselves against their attackers by marking their attackers back.
 # RULES: Once there are only 2 players left, the quota checks will stop, and the last two players will have to fight it out, as long as it takes, to win the game.
@@ -72,7 +73,7 @@ from twilio.rest import Client
 from Survivor import settings
 
 EMAIL_SUBJECT_LINE = 'FIJI Survivor'
-EMAIL_FROM_ADDRESS = 'chswgw@gmail.com'
+EMAIL_FROM_ADDRESS = 'fijisurvivor@gmail.com'
 MESSAGE_HEADER = '---- Survivor ---- '  # TODO Ben
 DEFAULT_REGISTRATION_PERIOD_DAYS = 7  # TODO: 1 week for signup by default
 DEFAULT_QUOTA_PERIOD_DAYS = 7  # TODO: number of days per quota check; players need to get at least 1 kill every 7 days by default
@@ -325,9 +326,11 @@ class Game(models.Model):
                 except Exception as e:
                     print(e)  # TODO: log error
             if player.user.email:
-                message = (EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email])
-                message_list.append(message)
-        send_mass_mail(message_list, fail_silently=True)
+                send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email], fail_silently=True)
+                print(player.user.email)
+        #         message = (EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email])
+        #         message_list.append(message)
+        # send_mass_mail(tuple(message_list), fail_silently=True)  # TODO: send_mail() works but send_mass_mail() doesn't; why?
 
     def send_message_to_admin(self, message):  # TODO: temp
         send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [self.admin.email], fail_silently=True)

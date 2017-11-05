@@ -9,10 +9,10 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         game = Game.objects.get_current()
         if game:
-            quota_check = game.do_quota_check()
-            if quota_check:
+            quota_check_performed = game.do_quota_check()
+            if quota_check_performed:
                 self.stdout.write(self.style.SUCCESS('Successfully performed quota check'))
             else:
-                self.stdout.write(self.style.SUCCESS('Next quota check is on' + game.date_next_quota_check))
+                self.stdout.write(self.style.SUCCESS('Quota check was skipped'))
         else:
             self.stdout.write(self.style.SUCCESS('Current game not found'))

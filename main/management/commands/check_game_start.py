@@ -9,7 +9,7 @@ class Command(BaseCommand):
     def handle(self, *args, **options):
         game = Game.objects.get_current()
         if game:
-            if game.date_start >= date.today():
+            if date.today() <= game.date_start:
                 if game.has_started:
                     self.stdout.write(self.style.SUCCESS('Game has already started'))
                 else:
@@ -18,6 +18,6 @@ class Command(BaseCommand):
                     else:
                         self.stdout.write(self.style.SUCCESS('Cannot start game with less than 2 players'))
             else:
-                self.stdout.write(self.style.SUCCESS('Game start date is set to ' + game.date_start))
+                self.stdout.write(self.style.SUCCESS('Game start date is set to ' + str(game.date_start)))
         else:
             self.stdout.write(self.style.SUCCESS('Current game not found'))
