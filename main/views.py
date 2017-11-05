@@ -191,11 +191,11 @@ def create_game(request):
     else:
         game_form = GameForm()
 
-        context = {
-            'game_form': game_form,
-        }
+    context = {
+        'game_form': game_form,
+    }
 
-        return render(request, 'main/game_create.html', context)
+    return render(request, 'main/game_create.html', context)
 
 @staff_member_required
 def update_game(request):
