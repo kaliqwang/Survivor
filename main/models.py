@@ -270,7 +270,8 @@ class Game(models.Model):
             self.has_started = True
             self.details = "Game is in progress"
             self.save()
-            self.send_mass_message(self.players.all(), GAME_START_MESSAGE)
+            for p in self.players.all():
+                self.send_message(p, GAME_START_MESSAGE % p.target)
             return True
         return False
 
