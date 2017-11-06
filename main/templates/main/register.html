@@ -67,6 +67,15 @@
       </div>
     </div>
 
+    <div class="row form-group">
+      <label for="{{ profile_form.codename.id_for_label }}" class="col-sm-3 col-form-label">{{ profile_form.codename.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if profile_form.codename.errors %}form-error{% endif %}">{{ profile_form.codename }}</div>
+        {{ profile_form.codename.help_text }}
+        {{ profile_form.codename.errors }}
+      </div>
+    </div>
+
     <br>
 
     <button class="btn btn-lg btn-success btn-block" type="submit">Create New Account</button>

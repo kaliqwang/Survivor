@@ -134,6 +134,7 @@ class SingletonModel(models.Model):
 class UserProfile(models.Model):
     user = models.OneToOneField(User, related_name='profile', on_delete=models.CASCADE)
     phone_num = models.CharField(validators=[phone_validator], max_length=10)  # TODO: unique=True
+    codename = models.CharField(max_length=50)
     # image_url = models.URLField('Image URL')
 
     def __str__(self):

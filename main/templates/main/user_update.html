@@ -31,6 +31,15 @@
       </div>
     </div>
 
+  <div class="row form-group">
+      <label for="{{ form.codename.id_for_label }}" class="col-sm-3 col-form-label">{{ form.codename.label }}</label>
+      <div class="col-sm-9">
+        <div class="{% if form.codename.errors %}form-error{% endif %}">{{ form.codename }}</div>
+        {{ form.codename.help_text }}
+        {{ form.codename.errors }}
+      </div>
+    </div>
+
     <br>
 
     <button class="btn btn-lg btn-success btn-block" type="submit">Apply</button>

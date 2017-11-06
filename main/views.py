@@ -116,13 +116,14 @@ def user_update(request):
             user = request.user
             user.email = form.cleaned_data['email']
             user.profile.phone_num = form.cleaned_data['phone_num']
+            user.profile.codename = form.cleaned_data['codename']
             user.save()
             user.profile.save()
             messages.add_message(request, messages.INFO, "Successfully updated user", extra_tags='success')
             return HttpResponseRedirect(reverse('index'))
     else:
         user = request.user
-        form = UserUpdateForm(initial={'phone_num': user.profile.phone_num, 'email': user.email})
+        form = UserUpdateForm(initial={'email': user.email, 'phone_num': user.profile.phone_num, 'codename': user.profile.codename})
 
     context = {
         'form': form,

@@ -36,9 +36,6 @@ class UserForm(ModelForm):
             'password': PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
             'email': EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
         }
-        help_texts = {
-            'username': 'This is your secret codename. Pick something that cannot be used to identify you.',
-        }
 
     def clean(self, *args, **kwargs):
         self.cleaned_data['first_name'] = self.data['first_name'].capitalize()
@@ -50,12 +47,14 @@ class UserProfileForm(ModelForm):
 
     class Meta:
         model = UserProfile
-        fields = ('phone_num',)
+        fields = ('phone_num', 'codename')
         widgets = {
             'phone_num': TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'type': 'tel', 'autofocus': 'autofocus'}),
+            'codename': TextInput(attrs={'class': 'form-control', 'placeholder': 'Codename'}),
         }
         help_texts = {
             'phone_num': 'For text notifications (recommended)',
+            'codename': "Your anonymous name on the leaderboard. Pick something that can't be used to identify you",
         }
 
     def __init__(self, user=None, *args, **kwargs):
@@ -66,7 +65,7 @@ class UserProfileForm(ModelForm):
 class UserUpdateForm(forms.Form):
     email = forms.EmailField(required=False, help_text='For email notifications (optional)', widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'autofocus': 'autofocus'}))
     phone_num = forms.CharField(label='Phone Number', required=False, validators=[phone_validator], help_text='For text notifications (recommended)', widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'type': 'tel'}))
-
+    codename = forms.CharField(required=True, help_text="Your anonymous name on the leaderboard. Pick something that can't be used to identify you", widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Codename'}))
 
 class LoginForm(forms.Form):
     username = forms.CharField(widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'Username', 'autofocus': 'autofocus'}))
