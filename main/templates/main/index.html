@@ -70,7 +70,9 @@
               <h3>{{ player.target }}</h3>
               <br>
               <a href="{% url 'killed-target' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Target Eliminated</a>
-              <a href="{% url 'killed-attacker' %}" class="btn btn-lg btn-warning btn-block btn-long-resp">Killed Attacker in Self Defense</a>
+              {% if game.num_alive <= 10 %}
+                <a href="{% url 'killed-attacker' %}" class="btn btn-lg btn-warning btn-block btn-long-resp">Killed Attacker in Self Defense</a>
+              {% endif %}
             </div>
             <div class="col-sm">
               <br>
