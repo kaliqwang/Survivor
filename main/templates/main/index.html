@@ -185,38 +185,26 @@
       <div class="col-sm">
         <br>
         <h4>The game is about to start!</h4>
-      </div>
-      <div class="col-sm">
         <div class="card bg-dark">
           <div class="card-body" id="timer-game-start"></div>
         </div>
-      </div>
-      {% if user.is_superuser %}
+        <br>
+        {% if user.is_superuser %}
         <!--Admin User-->
-        <div class="col-sm">
-          <br>
           <a href="{% url 'start-game' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Manually Start Game Now</a>
-        </div>
-      {% else %}
-        <!--Normal User-->
-        {% if player %}
-          <div class="col-sm">
-            <br>
+        {% else %}
+          <!--Normal User-->
+          {% if player %}
             <h4>You have joined the game.</h4>
             <a href="{% url 'leave-game' %}" class="btn btn-lg btn-warning btn-block btn-long-resp">Leave Game</a>
-          </div>
-        {% else %}
-          <div class="col-sm">
-            <br>
+          {% else %}
             <a href="{% url 'join-game' %}" class="btn btn-lg btn-success btn-block btn-long-resp">Join Game</a>
-          </div>
+          {% endif %}
         {% endif %}
-      {% endif %}
+        <br>
+        <div class="text-center"><h4>Players registered: {{ game.num_players }}</h4></div>
+      </div>
     </div>
-
-    <hr>
-
-    <div class="text-center"><h4>Players registered: {{ game.num_players }}</h4></div>
   {% endif %}
 {% else %}
   <!--Current game does not exist-->
@@ -235,9 +223,7 @@
     var dateQuotaCheck = new Date({{ date_next_quota_check.year }}, {{ date_next_quota_check.month }} - 1, {{ date_next_quota_check.day }});
     console.log(dateQuotaCheck);
     $('#timer-quota-check').countdown(dateQuotaCheck)
-      .on('update.countdown', function (event) {
-        $(this).text(event.strftime('%-D days %H:%M:%S'));
-      })
+      .on('update.countdown', updateTimerDisplay)
       .on('finish.countdown', function (event) {
         <!--TODO-->
       })
@@ -247,16 +233,22 @@
   {% elif not game.has_started %}
     var dateGameStart = new Date({{ game.date_start.year }}, {{ game.date_start.month }} - 1, {{ game.date_start.day }});
     $('div#timer-game-start').countdown(dateGameStart)
-      .on('update.countdown', function (event) {
-        $(this).text(event.strftime('%-D days %H:%M:%S'));
-      })
+      .on('update.countdown', updateTimerDisplay)
       .on('finish.countdown', function (event) {
         <!--TODO-->
       })
       .on('stop.countdown', function (event) {
         <!--TODO-->
       });
-   {% endif %}
+  {% endif %}
+
+  function updateTimerDisplay(event) {
+    if (event.offset.totalDays > 0) {
+      $(this).text(event.strftime('%-D days %H:%M:%S'));
+    } else {
+      $(this).text(event.strftime('%H:%M:%S'));
+    }
+  }
 </script>
 
 {% endblock %}

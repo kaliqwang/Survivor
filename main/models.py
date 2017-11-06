@@ -63,6 +63,12 @@ from twilio.rest import Client
 
 # TODO: post useful information to the admin user about Twilio (e.g., pricing at $0.0075 per text notification; around 4 (or however many) notifications expected per player; so $20 can support ___ players, $30 can support ___ players, etc. etc.). Allow admin to customize what kinds of notifications are sent (based on how much he plans to charge to his account). He can choose bare minimum notifications (e.g. approx 4 notifications sent per player). Or he can choose to also enable optional "reminder" messages to people periodically. Etc. etc.
 
+# TODO: automatic text notification when game quota period has changed?
+
+# TODO: implement way for admin user to send a custom text notification/message to all players.
+
+# TODO: remove the user_data.csv file and the initialize_users management command
+
 # RULES: Once there are 10 players left, players kill their targets by marking their skin with permanent marker. Players also have the ability to defend themselves against their attackers by marking their attackers back.
 # RULES: Once there are only 2 players left, the quota checks will stop, and the last two players will have to fight it out, as long as it takes, to win the game.
 

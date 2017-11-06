@@ -30,7 +30,7 @@ class Command(BaseCommand):
                 email = row[4]
                 phone_num = row[5]
 
-                user = User(first_name=first_name, last_name=last_name, username=username, password=password, email=email)
+                user = User.objects.create_user(first_name=first_name, last_name=last_name, username=username, password=password, email=email)
                 user.save()
                 user.profile.phone_num = phone_num
                 user.profile.codename = codename
