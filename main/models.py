@@ -143,7 +143,7 @@ class UserProfile(models.Model):
 
 class Game(models.Model):
     # Game settings
-    admin = models.ForeignKey(User, related_name='games_as_admin', on_delete=models.CASCADE)
+    admin = models.ForeignKey(User, related_name='games_as_admin', blank=True, null=True, on_delete=models.SET_NULL)  # TODO: what to do if admin gets deleted? Implement some way for new admin user to take control over game
     date_start = models.DateField(default=default_start_date, help_text='Game starts at midnight')
     date_end = models.DateField(blank=True, null=True)
     date_close = models.DateField(blank=True, null=True)
