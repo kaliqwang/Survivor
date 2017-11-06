@@ -209,7 +209,7 @@ class Game(models.Model):
         players = self.players_ordered
         for p in players:
             p.sync_num_kills()
-        return self.players.order_by('-num_kills_copy')
+        return self.players.order_by('-num_kills_copy', '-alive')  # TODO: temp fix; function name not entirely appropriate
 
     @property
     def num_players(self):
