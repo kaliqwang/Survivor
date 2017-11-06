@@ -1,5 +1,5 @@
 from django import forms
-from django.forms import Form, ModelForm, ValidationError, TextInput, NumberInput, PasswordInput
+from django.forms import Form, ModelForm, ValidationError, TextInput, NumberInput, PasswordInput, DateInput, EmailInput
 
 from .models import *
 
@@ -10,9 +10,9 @@ class GameForm(ModelForm):
         model = Game
         fields = ['date_start', 'quota_period_days', 'twilio_phone_num', 'twilio_account_sid', 'twilio_auth_token']
         widgets = {
-            'date_start': TextInput(attrs={'class': 'form-control date start', 'placeholder': 'mm/dd/yyyy', 'autofocus': 'autofocus'}),  # TODO: data format? make datepicker automatically pop up when field is focused
+            'date_start': DateInput(attrs={'class': 'form-control date start', 'placeholder': 'mm/dd/yyyy', 'autofocus': 'autofocus'}),  # TODO: data format? make datepicker automatically pop up when field is focused
             'quota_period_days': NumberInput(attrs={'class': 'form-control'}),
-            'twilio_phone_num': TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX'}),
+            'twilio_phone_num': TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'type': 'tel'}),
             'twilio_account_sid': TextInput(attrs={'class': 'form-control', 'placeholder': '34 characters long'}),
             'twilio_auth_token': TextInput(attrs={'class': 'form-control', 'placeholder': '32 characters long'}),
         }
@@ -34,7 +34,7 @@ class UserForm(ModelForm):
             'last_name': TextInput(attrs={'class': 'form-control', 'placeholder': 'Last Name'}),
             'username': TextInput(attrs={'class': 'form-control', 'placeholder': 'Username'}),
             'password': PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Password'}),
-            'email': TextInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
+            'email': EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email'}),
         }
         help_texts = {
             'username': 'This is your secret codename. Pick something that cannot be used to identify you.',
@@ -52,7 +52,7 @@ class UserProfileForm(ModelForm):
         model = UserProfile
         fields = ('phone_num',)
         widgets = {
-            'phone_num': TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'autofocus': 'autofocus'}),
+            'phone_num': TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'type': 'tel', 'autofocus': 'autofocus'}),
         }
         help_texts = {
             'phone_num': 'For text notifications (recommended)',
@@ -64,8 +64,8 @@ class UserProfileForm(ModelForm):
 
 
 class UserUpdateForm(forms.Form):
-    email = forms.EmailField(required=False, help_text='For email notifications (optional)', widget=TextInput(attrs={'class': 'form-control', 'autofocus': 'autofocus'}))
-    phone_num = forms.CharField(label='Phone Number', required=False, validators=[phone_validator], help_text='For text notifications (recommended)', widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX'}))
+    email = forms.EmailField(required=False, help_text='For email notifications (optional)', widget=EmailInput(attrs={'class': 'form-control', 'placeholder': 'Email', 'autofocus': 'autofocus'}))
+    phone_num = forms.CharField(label='Phone Number', required=False, validators=[phone_validator], help_text='For text notifications (recommended)', widget=TextInput(attrs={'class': 'form-control', 'placeholder': 'XXXXXXXXXX', 'type': 'tel'}))
 
 
 class LoginForm(forms.Form):

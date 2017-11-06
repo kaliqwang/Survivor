@@ -10,15 +10,18 @@
     <!--Admin User-->
     <div class="row">
       {% if game.has_ended %}
-        <div class="col-sm">
+        <div class="col">
+          <br>
           <a href="{% url 'close-game' %}" class="btn btn-lg btn-primary btn-block btn-long-resp" >Close Game</a>
           <div class="text-center">(Will remove game results from website)</div>
         </div>
       {% else %}
-        <div class="col-sm">
+        <div class="col">
+          <br>
           <a href="{% url 'close-game' %}" class="btn btn-lg btn-danger btn-block btn-long-resp">Cancel Game</a>
         </div>
-        <div class="col-sm">
+        <div class="col">
+          <br>
           <a href="{% url 'update-game' %}" class="btn btn-lg btn-secondary btn-block btn-long-resp">Game Settings</a>
         </div>
       {% endif %}

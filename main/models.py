@@ -16,12 +16,6 @@ from django.db.models import When
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from twilio.rest import Client
-# from twilio.rest.resources import Connection
-# from twilio.rest.resources.connection import PROXY_TYPE_HTTP
-
-# proxy_url = os.environ.get("http_proxy")
-# host, port = urlparse(proxy_url).netloc.split(":")
-# Connection.set_proxy_info(host, int(port), proxy_type=PROXY_TYPE_HTTP)
 
 # TODO: favicon for website
 
@@ -314,7 +308,7 @@ class Game(models.Model):
     def send_message(self, player, message):
         if player.user.profile.phone_num:
             try:
-                self.client.messages.create(to='+1'+player.user.profile.phone_num, from_='+1'+self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
             except Exception as e:
                 print(e)  # TODO: log error
         if player.user.email:
@@ -325,7 +319,7 @@ class Game(models.Model):
         for player in players:
             if player.user.profile.phone_num:
                 try:
-                    self.client.messages.create(to='+1'+player.user.profile.phone_num, from_='+1'+self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                    self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
                 except Exception as e:
                     print(e)  # TODO: log error
             if player.user.email:
