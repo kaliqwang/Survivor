@@ -74,9 +74,9 @@ from twilio.rest import Client
 
 from Survivor import settings
 
-EMAIL_SUBJECT_LINE = 'FIJI Survivor'
-EMAIL_FROM_ADDRESS = 'fijisurvivor@gmail.com'
-MESSAGE_HEADER = '---- FIJI Survivor ---- '  # TODO Ben
+EMAIL_SUBJECT_LINE = 'Centennial Water Gun Wars'
+EMAIL_FROM_ADDRESS = 'chswgw@gmail.com'
+MESSAGE_HEADER = '---- Water Gun Wars ----\n'  # TODO Ben
 DEFAULT_REGISTRATION_PERIOD_DAYS = 7  # TODO: 1 week for signup by default
 DEFAULT_QUOTA_PERIOD_DAYS = 7  # TODO: number of days per quota check; players need to get at least 1 kill every 7 days by default
 

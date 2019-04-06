@@ -1,0 +1,48 @@
+PythonAnywhere config:
+
+1. Create virtualenv: https://help.pythonanywhere.com/pages/VirtualEnvForNewerDjango/
+2. Clone repo from GitHub and checkout appropriate branch
+3. Files: delete db.sqlite3 if you want to reset data
+4. pip install -r requirements.txt
+5. python manage.py makemigrations
+6. python manage.py migrate
+7. python manage.py createsuperuser
+8. python manage.py collectstatic
+9. Files: double check settings.py - DEBUG=False, etc.
+10. Web: create new webapp
+
+Source code:
+/home/fijisurvivor/Survivor/
+
+Python version:
+3.6
+
+Virtualenv:
+/home/fijisurvivor/.virtualenvs/fijisurvivor/
+
+Static files:
+/static/        /home/fijisurvivor/Survivor/static/
+/static/admin/  /home/fijisurvivor/.virtualenvs/fijisurvivor/lib/python3.6/site-packages/django/contrib/admin/static/admin
+
+WSGI configuration file:
+
+    activate_this = '/home/fijisurvivor/.virtualenvs/fijisurvivor/bin/activate_this.py'
+    with open(activate_this) as f:
+        code = compile(f.read(), activate_this, 'exec')
+        exec(code, dict(__file__=activate_this))
+
+    import os
+    import sys
+
+    path = '/home/fijisurvivor/Survivor'
+    if path not in sys.path:
+        sys.path.append(path)
+
+    os.chdir(path)
+
+    os.environ['DJANGO_SETTINGS_MODULE'] = 'Survivor.settings'
+
+    from django.core.wsgi import get_wsgi_application
+    application = get_wsgi_application()
+
+11. Tasks: setup any scheduled tasks
