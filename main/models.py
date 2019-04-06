@@ -17,60 +17,57 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from twilio.rest import Client
 
-# TODO: favicon for website
+# TODO: customization (non-bugs)
+'''
+customize text notification messages
+send text notification to admin every time elimination occurs?
+'''
 
-# TODO: ask ben to customize text notification messages
+# TODO: system behavior (bugs)
+'''
+make sure cannot undo elimination once game has ended
+prevent duplicate accounts (enforce unique phone-numbers)
+make sure multiple spammed requests don't break the app
+make sure that simultaneous requests don't break the app (thread-safety)
+fix timezone-aware issues
+allow admin to specify game start date AND time - not just date
+write test cases in tests.py; create a function verify_player_sequence_integrity - which literally traverses from player to target - making sure that the number of jumps is equal to the number of living players and that the last player is the same as the first player (e.g. - full circle).
 
-# TODO: state in rules that players should get a text nofication whenever they submit that they eliminated a player. If they don't get a notification, they should submit again.
+'''
 
-# TODO: provide an error message to player if their elimination submission failed / something went wrong
+# TODO: features to add
+'''
+Reverting an elimination displays list of dependencies to admin first for confirmation
+implement way for admin user to send a custom text notification/message to all players. Also - allow users to create custom "messages" on the index page that display in those fancy alert bars. Allow admin to set expiration on the message (e.g. - number of days? until end of game? etc.) Allow admin to cancel these messages.
+automatic text notification when game quota period has changed?
+'''
 
-# TODO: when logged in as admin, show list of eliminations - and allow admin to click "undo" next to an elimination. Clicking this opens a dialog that displays a list of dependencies (e.g. eliminations that will also need to be undone as a result) to confirm. Admin can then click "proceed" or "cancel".
+# TODO: clean up
+'''
+terminology: kill vs elimination, alive vs active, dead vs inactive, num_kills vs num_eliminations, reset vs revive vs revert vs revert, etc.
+remove the user_data.csv file and the initialize_users management command
+'''
 
-# TODO: ask ben: do we need to prevent people from making duplicate accounts (e.g. giving themselves extra lives)? probably not right? since if someone gets killed, but then later ends up winning, the original attacker will come forward?
-# we could though - by enforcing unique phone-numbers?
+# TODO: performance
+'''
+database access optimization: select_related()
+    what objects / database accesses can be cached - e.g. situations where the object never changes? For example - sending message to all players in the game - the list of players never changes, BUT - the phone number / email information COULD change, thus - we CANNOT cache the list of players and DO need to refetch from database every time.
+'''
 
-# TODO: ask ben: send text notification to admin every time elimination occurs?
+# TODO: ui improvements
+'''
+favicon
 
-# TODO: cannot undo elimination once game has ended
+put quota check timer in nav bar?
+put global game timer (counting from 0 to infinity) in nav bar?
+replace all <br> elements with proper CSS margins/padding
 
-# TODO: terminology: kill vs elimination, alive vs active, dead vs inactive, num_kills vs num_eliminations, etc.
-# TODO: terminology: reset vs revive vs revert vs revert, etc.
-
-# TODO: make sure that multiple spammed requests don't break the app (e.g. what happens if admin user spams "start_game" a bunch of times?)
-
-# TODO: does django handle multiple requests simultaneously/asynchronously? If so, need to recheck everything to make sure thread-safe
-
-# TODO: refactor - consolidate multiple functions into single function
-
-# TODO: messaging - send email/text messages to Ben
-
-# TODO: jQuery confirmation dialogs for everything
-
-# TODO: display message to user: quota check every 5 days or something
-
-# TODO: add simple confirmation page for most buttons (e.g. target eliminate, cancel game, etc.)
-
-# TODO: idea: display a timer in the navbar for the global game timer (e.g. how much time has elapsed in the game already - days? weeks? months? etc.) - would be kind of cool; search for a jQuery clock plugin
-
-# TODO: double check when things can be done; e.g. eliminations cannot be reverted once a game has ended or closed
-
-# TODO: in HTML, replace all <br> elements with proper margins/padding
-
-# TODO: fix timezone-aware issues (e.g. on confirm revert elimination page - make sure timestamp is correct)
-
-# TODO: favicon doesn't work
-
-# TODO: post useful information to the admin user about Twilio (e.g., pricing at $0.0075 per text notification; around 4 (or however many) notifications expected per player; so $20 can support ___ players, $30 can support ___ players, etc. etc.). Allow admin to customize what kinds of notifications are sent (based on how much he plans to charge to his account). He can choose bare minimum notifications (e.g. approx 4 notifications sent per player). Or he can choose to also enable optional "reminder" messages to people periodically. Etc. etc.
-
-# TODO: automatic text notification when game quota period has changed?
-
-# TODO: implement way for admin user to send a custom text notification/message to all players.
-
-# TODO: remove the user_data.csv file and the initialize_users management command
+post useful information to the admin user about Twilio (e.g., pricing at $0.0075 per text notification; around 4 (or however many) notifications expected per player; so $20 can support ___ players, $30 can support ___ players, etc. etc.). Allow admin to customize what kinds of notifications are sent (based on how much he plans to charge to his account). He can choose bare minimum notifications (e.g. approx 4 notifications sent per player). Or he can choose to also enable optional "reminder" messages to people periodically. Etc. etc.
 
 # RULES: Once there are 10 players left, players kill their targets by marking their skin with permanent marker. Players also have the ability to defend themselves against their attackers by marking their attackers back.
 # RULES: Once there are only 2 players left, the quota checks will stop, and the last two players will have to fight it out, as long as it takes, to win the game.
+state in rules that players should get a text nofication whenever they submit that they eliminated a player. If they don't get a notification, they should submit again.
+'''
 
 from Survivor import settings
 
@@ -170,7 +167,7 @@ class Game(models.Model):
     def __init__(self, *args, **kwargs):
         super(Game, self).__init__(*args, **kwargs)
         self.client = None
-        if self.twilio_account_sid and self.twilio_auth_token:
+        if self.twilio_account_sid and self.twilio_auth_token:  # TODO: client needs to change every time twilio credentials change (e.g. in save() method)
             self.client = Client(self.twilio_account_sid, self.twilio_auth_token)
 
     def __str__(self):
@@ -264,6 +261,29 @@ class Game(models.Model):
         players[last].target = players[0]
         players[last].save()
 
+    def randomize_player_sequence(self):  # TODO: this breaks elimination revert mechanism
+        # TODO: for now, don't reassign player position; just randomize target assignments
+        players = list(self.players_alive.order_by('?'))
+        for i in range(0, len(players)):
+            players[i].target = None
+            players[i].save()
+        last = len(players) - 1
+        for i in range(0, last):
+            players[i].target = players[i + 1]
+            players[i].save()
+        players[last].target = players[0]
+        players[last].save()
+
+        for player in players:
+            message = "Player sequence has been randomized. Your new target is %s" % player.target
+            if player.user.profile.phone_num:
+                try:
+                    self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                except Exception as e:
+                    print(e)  # TODO: log error
+            if player.user.email:
+                send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email], fail_silently=True)
+
     def start(self):
         if self.num_players > 1:  # NOTE: cannot start a war with less than two players
             self.initialize_player_sequence()
@@ -271,8 +291,7 @@ class Game(models.Model):
             self.has_started = True
             self.details = "Game is in progress"
             self.save()
-            for p in self.players.all():
-                self.send_message(p, GAME_START_MESSAGE % p.target)
+            self.send_game_start_message_all_players()
             return True
         return False
 
@@ -287,7 +306,7 @@ class Game(models.Model):
         self.has_ended = True
         self.details = "Game ended normally"
         self.save()
-        self.send_mass_message(self.players.all(), GAME_END_MESSAGE)
+        self.send_message_all_players(GAME_END_MESSAGE)
 
     def close(self):
         self.date_close = date.today()
@@ -296,7 +315,7 @@ class Game(models.Model):
         if not self.has_ended:
             self.details = "Game was cancelled"
             self.save()
-            self.send_mass_message(self.players.all(), GAME_CANCELLED_MESSAGE)
+            self.send_message_all_players(GAME_CANCELLED_MESSAGE)
 
     # TODO: make sync-safe with server state
     def do_quota_check(self):  # TODO: link this to admin commands / management commands  # TODO: refactor: do_quota_check should unconditionally perform the quota check, create a new quota_check() method to wrap
@@ -311,19 +330,37 @@ class Game(models.Model):
                 self.save()
                 return QuotaCheck.objects.create(game=self)
         return None
+        # TODO: return number of players eliminated as a result of the quota check?
 
     def send_message(self, player, message):
-        if player.user.profile.phone_num:
+        user = User.objects.select_related('profile').get(pk=player.user_id)  # single database hit
+        if user.profile.phone_num:
             try:
-                self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                self.client.messages.create(to=user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
             except Exception as e:
                 print(e)  # TODO: log error
-        if player.user.email:
-            send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email], fail_silently=True)
+        if user.email:
+            send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [user.email], fail_silently=True)
 
     def send_mass_message(self, players, message):
         message_list = []
         for player in players:
+            user = User.objects.select_related('profile').get(pk=player.user_id)  # single database hit # TODO: bad performance; n database hits, where n is number of players
+            if user.profile.phone_num:
+                try:
+                    self.client.messages.create(to=user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                except Exception as e:
+                    print(e)  # TODO: log error
+            if user.email:
+                send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [user.email], fail_silently=True)
+        #         message = (EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email])
+        #         message_list.append(message)
+        # send_mass_mail(tuple(message_list), fail_silently=True)  # TODO: send_mail() works but send_mass_mail() doesn't; why? https://docs.djangoproject.com/en/1.11/topics/email/#django.core.mail.send_mail
+
+    def send_game_start_message_all_players(self):
+        players = Player.objects.filter(game=self).select_related('user__profile').select_related('target__user').all()  # single database hit
+        for player in players:
+            message = GAME_START_MESSAGE % player.target # TODO: verify that player.target.__str__() does not result in extra database hit to get player.target.user.first_name and player.target.user.last_name
             if player.user.profile.phone_num:
                 try:
                     self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
@@ -331,10 +368,18 @@ class Game(models.Model):
                     print(e)  # TODO: log error
             if player.user.email:
                 send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email], fail_silently=True)
-                print(player.user.email)
-        #         message = (EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email])
-        #         message_list.append(message)
-        # send_mass_mail(tuple(message_list), fail_silently=True)  # TODO: send_mail() works but send_mass_mail() doesn't; why? https://docs.djangoproject.com/en/1.11/topics/email/#django.core.mail.send_mail
+
+    def send_new_target_message_all_players_alive(self):
+        players = Player.objects.filter(game=self).filter(alive=True).select_related('user__profile').select_related('target__user').all()  # single database hit
+        for player in players:
+            message = GAME_START_MESSAGE % player.target # TODO: verify that player.target.__str__() does not result in extra database hit to get player.target.user.first_name and player.target.user.last_name
+            if player.user.profile.phone_num:
+                try:
+                    self.client.messages.create(to=player.user.profile.phone_num, from_=self.twilio_phone_num, body=MESSAGE_HEADER+message)
+                except Exception as e:
+                    print(e)  # TODO: log error
+            if player.user.email:
+                send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [player.user.email], fail_silently=True)
 
     def send_message_to_admin(self, message):  # TODO: temp
         send_mail(EMAIL_SUBJECT_LINE, message, EMAIL_FROM_ADDRESS, [self.admin.email], fail_silently=True)
@@ -361,7 +406,8 @@ class Player(models.Model):
         unique_together = ('game', 'user')
 
     def __str__(self):
-        return self.user.first_name + " " + self.user.last_name
+        user = self.user # TODO: bad performance; use select_related('user')
+        return user.first_name + " " + user.last_name
 
     @property
     def dead(self):
@@ -435,16 +481,6 @@ class QuotaCheck(models.Model):
     timestamp = models.DateTimeField(auto_now_add=True)
     valid = models.BooleanField(default=True)
 
-    def save(self, *args, **kwargs):
-        if not self.pk:  # TODO: only on creation?
-            for p in self.game.players_alive_ordered:
-                if p.quota_met:
-                    p.num_kills_prev_quota_check = self.num_kills
-                    p.save()
-                else:
-                    Elimination.objects.create(game=self.game, quota_check=self, target=p)  # TODO: check duplicate eliminations in save() method?
-        super(QuotaCheck, self).save(*args, **kwargs)
-
     def revert(self, revert_dependencies=True):  # TODO: reverting this quotacheck, means that all future quota checks need to be reverted too; or just make it so that only the most recent quota check is allowed to be reverted?
         num_reverted = 0
         if self.valid:
@@ -456,6 +492,18 @@ class QuotaCheck(models.Model):
             for e in self.eliminations.order_by('-pk').all():
                 num_reverted += e.revert_helper(revert_quota_check_dependencies=False)
         return num_reverted
+
+
+@receiver(post_save, sender=QuotaCheck)
+def perform_quota_check(sender, instance=None, created=False, **kwargs):  # TODO: rename
+    if created:
+        for p in instance.game.players_alive_ordered:
+            if p.quota_met:
+                p.num_kills_prev_quota_check = p.num_kills
+                p.save()
+            else:
+                Elimination.objects.create(game=instance.game, quota_check=instance, target=p)  # TODO: check duplicate eliminations in save() method?
+                # TODO: players aren't getting text notifications after being eliminated by quota check?
 
 
 class Elimination(models.Model):
@@ -475,7 +523,7 @@ class Elimination(models.Model):
 
     @property
     def from_quota_check(self):
-        return self.quota_check is not None
+        return self.quota_check_id is not None  # TODO: is id of null foreign key None or 0?
 
     @property
     def killer(self):
@@ -493,23 +541,33 @@ class Elimination(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.pk:  # TODO: only on creation?
-            self.attacker = self.target.attacker
-            self.attacker.target = self.target.target
+            # target = self.target
+            # attacker = target.attacker  # database hit
+            # target_target = target.target  # database hit
+            # attacker.target = target_target
+            # target.target = None
+            # target.alive = False
+            # target.save()
+            # attacker.save()
+            # self.attacker = attacker
+
+            self.attacker = self.target.attacker  # single database hit
+            self.attacker.target = self.target.target  # single database hit
             self.target.target = None
             self.target.alive = False
             self.target.save()
             self.attacker.save()
-            if self.from_quota_check:
-                self.game.send_message(self.target, ELIMINATED_BY_QUOTA_CHECK_MESSAGE)
-                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_QUOTA_CHECK_MESSAGE % self.target.target)  # TODO: Player.__str__() automatically called? CONFIRMED: IT DOES CONVERT TO STRING; NO WORRIES
-            elif self.is_reverse:
-                self.game.send_message(self.target, ELIMINATED_BY_TARGET_MESSAGE % self.attacker.target)
-                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_TARGET_MESSAGE % (self.target, self.attacker.target))
-                self.game.send_message(self.attacker.target, ATTACKER_ELIMINATED_BY_TARGET_MESSAGE % self.target)
-            else:
-                self.game.send_message(self.target, ELIMINATED_BY_ATTACKER_MESSAGE % self.attacker)
-                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_ATTACKER_MESSAGE % (self.target, self.attacker.target))
-            self.game.do_check_end()  # TODO NOTE: quota checks should not be able to end the game
+            if self.from_quota_check:  # killed by quota check
+                self.game.send_message(self.target, ELIMINATED_BY_QUOTA_CHECK_MESSAGE)  # single database hit
+                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_QUOTA_CHECK_MESSAGE % self.attacker.target)  # single database hit
+            elif self.is_reverse:  # self-defense kill
+                self.game.send_message(self.target, ELIMINATED_BY_TARGET_MESSAGE % self.attacker.target)  # single database hit
+                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_TARGET_MESSAGE % (self.target, self.attacker.target))  # single database hit
+                self.game.send_message(self.attacker.target, ATTACKER_ELIMINATED_BY_TARGET_MESSAGE % self.target)  # single database hit
+            else:  # normal kill
+                self.game.send_message(self.target, ELIMINATED_BY_ATTACKER_MESSAGE % self.attacker)  # single database hit
+                self.game.send_message(self.attacker, TARGET_ELIMINATED_BY_ATTACKER_MESSAGE % (self.target, self.attacker.target))  # single database hit
+            self.game.do_check_end()
         super(Elimination, self).save(*args, **kwargs)
 
     @property
